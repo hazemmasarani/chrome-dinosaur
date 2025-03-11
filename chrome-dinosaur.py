@@ -140,10 +140,10 @@ class Ground:
 
     def __init__(self):
         if not Ground.surface_tile:
-            ground_tiles = pygame.image.load(f'assets\\background\\pr.png').convert_alpha()
+            ground_tiles = pygame.image.load(f'assets\\background\\ground.png').convert_alpha()
             Ground.surface_tile = ground_tiles.subsurface(pygame.Rect(185, 19, 75, 75))
         if not Ground.buttom_tile:
-            ground_tiles = pygame.image.load(f'assets\\background\\pr.png').convert_alpha()
+            ground_tiles = pygame.image.load(f'assets\\background\\ground.png').convert_alpha()
             Ground.buttom_tile = ground_tiles.subsurface(pygame.Rect(185, 103, 75, 75))
         self.surface = []
         for i in range(0, SCREEN_WIDTH + 75 * 2, 75):
