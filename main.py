@@ -1,7 +1,6 @@
 import pygame
 import sys
 from random import randint
-from math import pow, sqrt
 
 pygame.init()
 
@@ -10,7 +9,7 @@ SCREEN_WIDTH = 1100
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 GROUND_Y = SCREEN_HEIGHT - SCREEN_HEIGHT // 3
 FPS = 30
-GAME_SPEED = 15
+GAME_SPEED = 20
 BACKGROUND_COLOR = (135, 206, 235)
 
 pygame.display.set_caption('Chrome Dinosaur🦖')
@@ -75,16 +74,24 @@ class Ground:
 
 # Cactus Class
 class Cactus:
-    def __init__(self, x_pos):
-        self.width, self.height = 40, 60
-        self.x_pos = x_pos
-        self.y_pos = SCREEN_HEIGHT - 100 - self.height
+    cactus_images = None
+    def __init__(self, pos_x, height):
+        if not Cactus.cactus_images:
+            Cactus.cactus_images = []
+            for i in range(2):
+                Cactus.cactus_images.append(pygame.image.load(f'assets\\sprite\\cactus\\cactus ({i}).png').convert_alpha())
+        cactus_index = randint(0,1)
+        self.height = height
+        self.width = Cactus.cactus_images[cactus_index].get_width() * self.height // Cactus.cactus_images[cactus_index].get_height()
+        self.scaled_cactus = pygame.transform.scale(Cactus.cactus_images[cactus_index], (self.width, self.height))
+        self.pos_x = pos_x
+        self.pos_y = GROUND_Y - self.height
 
     def update(self):
-        self.x_pos -= GAME_SPEED 
+        self.pos_x -= GAME_SPEED
 
     def draw(self):
-        pygame.draw.rect(SCREEN, (255, 0, 0), (self.x_pos, self.y_pos, self.width, self.height))
+        SCREEN.blit(self.scaled_cactus,(self.pos_x, self.pos_y))
 
 # Game Initialization
 dino = Dinosaur(100, 50, 100)
@@ -110,12 +117,12 @@ while running:
 
     # Update obstacles (Cacti)
     if randint(0, 100) < 2:  # Randomly spawn cactus
-        cacti.append(Cactus(SCREEN_WIDTH))
+        cacti.append(Cactus(SCREEN_WIDTH, randint(60, 120)))
 
     to_remove = []
     for cactus in cacti:
         cactus.update()
-        if cactus.x_pos < -cactus.width:
+        if cactus.pos_x < -cactus.width:
             to_remove.append(cactus)
 
     # Remove obstacles off-screen
