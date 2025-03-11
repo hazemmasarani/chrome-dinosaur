@@ -54,19 +54,24 @@ class Dinosaur:
 
 # Ground Class
 class Ground:
+    ground_tile = None
+
     def __init__(self):
-        self.x = 0
-        self.width = SCREEN_WIDTH
-        self.height = 100
-        self.y = SCREEN_HEIGHT - self.height
+        if not Ground.ground_tile:
+            Ground.ground_tile = pygame.image.load(f'assets\\background\\ground_tile.png').convert_alpha()
+        self.width = Ground.ground_tile.get_width()
+        self.tiles_coor = [[0, GROUND_Y], [self.width, GROUND_Y]]
 
     def update(self):
-        self.x -= GAME_SPEED
-        if self.x <= -self.width:
-            self.x = 0
+        for tile_coor in self.tiles_coor:
+            tile_coor[0] -= GAME_SPEED
+        if self.tiles_coor[0][0] < -self.width:
+            self.tiles_coor[0][0] = self.tiles_coor[1][0] + self.width
+            self.tiles_coor[0], self.tiles_coor[1] = self.tiles_coor[1], self.tiles_coor[0]
 
     def draw(self):
-        pygame.draw.rect(SCREEN, (0, 0, 0), (self.x, self.y, self.width, self.height))
+        for [x, y] in self.tiles_coor:
+            SCREEN.blit(Ground.ground_tile,(x,y))
 
 # Cactus Class
 class Cactus:
