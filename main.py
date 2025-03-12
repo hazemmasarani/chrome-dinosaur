@@ -1,5 +1,6 @@
 import pygame
 import sys
+import os
 from random import randint
 
 pygame.init()
@@ -9,7 +10,7 @@ SCREEN_WIDTH = 1100
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 GROUND_Y = SCREEN_HEIGHT - SCREEN_HEIGHT // 3
 FPS = 30
-GAME_SPEED = 20
+GAME_SPEED = 15
 BACKGROUND_COLOR = (135, 206, 235)
 
 pygame.display.set_caption('Chrome Dinosaur🦖')
@@ -18,14 +19,35 @@ clock = pygame.time.Clock()
 # Dinosaur Class
 class Dinosaur:
 
-    def __init__(self, pos_x, width, height):
-        self.pos_x, self.pos_y = pos_x, GROUND_Y - height
-        self.width, self.height = width, height
+    running_frames = None
+    jumping_frames = None
+
+    def __init__(self, pos_x, height):
+        self.height = height
+        if not Dinosaur.running_frames:
+            Dinosaur.running_frames = []
+            for path in os.listdir('assets\\sprite\\dinosaur\\running\\'):
+                frame = pygame.image.load(f'assets\\sprite\\dinosaur\\running\\{path}').convert_alpha()
+                self.width = frame.get_width() * height // frame.get_height()
+                scaled_frame = pygame.transform.scale(frame, (self.width, self.height))
+                Dinosaur.running_frames.append(scaled_frame)
+        if not Dinosaur.jumping_frames:
+            Dinosaur.jumping_frames = []
+            for path in os.listdir('assets\\sprite\\dinosaur\\jumping\\'):
+                frame = pygame.image.load(f'assets\\sprite\\dinosaur\\jumping\\{path}').convert_alpha()
+                self.width = frame.get_width() * height // frame.get_height()
+                scaled_frame = pygame.transform.scale(frame, (self.width, self.height))
+                Dinosaur.jumping_frames.append(scaled_frame)
+        self.width = Dinosaur.running_frames[0].get_width()
+        self.height -= 10
+        self.pos_x, self.pos_y = pos_x, GROUND_Y - self.height
         self.is_jumping = False
         self.gravity = 0.02
         self.cur_velocity = self.initial_velocity = 15
         self.jump_time = 0
-        
+        self.jump_frame_index = 0
+        self.running_frame_index = 0
+
     def run(self):
         return 
 
@@ -49,7 +71,16 @@ class Dinosaur:
             self.run()
 
     def draw(self):
-        pygame.draw.rect(SCREEN, (0, 255, 0), (self.pos_x, self.pos_y, self.width, self.height))
+        if self.is_jumping:
+            SCREEN.blit(Dinosaur.jumping_frames[self.jump_frame_index // 2],(self.pos_x, self.pos_y))
+            self.jump_frame_index += 1
+            self.jump_frame_index %= len(Dinosaur.jumping_frames)*2
+            self.running_frame_index = 0
+        else:
+            SCREEN.blit(Dinosaur.running_frames[self.running_frame_index // 3],(self.pos_x, self.pos_y))
+            self.running_frame_index += 1
+            self.running_frame_index %= len(Dinosaur.running_frames)*3
+            self.jump_frame_index = 0
 
 # Ground Class
 class Ground:
@@ -94,7 +125,7 @@ class Cactus:
         SCREEN.blit(self.scaled_cactus,(self.pos_x, self.pos_y))
 
 # Game Initialization
-dino = Dinosaur(100, 50, 100)
+dino = Dinosaur(100, 100)
 ground = Ground()
 cacti = []
 
