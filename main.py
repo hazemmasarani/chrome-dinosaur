@@ -148,6 +148,23 @@ class Obstical:
         for i in range(randint(0, 5)):
             cacti.append(Cactus(randint(lim_x1, lim_x2), randint(60, 120)))
 
+class Score:
+
+    def __init__(self):
+        self.width, self.height = 200, 50
+        self.boarder_x, self.boarder_y = 10, 10
+        self.score = 0
+        self.pos_x = SCREEN_WIDTH - self.width - self.boarder_x
+        self.pos_y = self.boarder_y
+    
+    def update(self):
+        self.score += GAME_SPEED//10
+    
+    def draw(self):
+        font = pygame.font.Font(None, 36)
+        score_text = font.render(f"Score: {self.score}", True, (255, 0, 0))  # White color text
+        SCREEN.blit(score_text, (self.pos_x, self.pos_y))
+
 # Check if the masks overlap
 def check_collision(dinosaur, cactus):
     frame_rect = dinosaur.cur_frame.get_rect()
@@ -168,6 +185,7 @@ def check_collision(dinosaur, cactus):
     return False  # No collision
 
 # Game Initialization
+score = Score()
 dino = Dinosaur(100, 100)
 ground = Ground()
 obsticals_generator = Obstical()
@@ -175,6 +193,7 @@ cacti = []
 
 running = True
 key_pressed = None
+end_game = False
 
 while running:
     for event in pygame.event.get():
@@ -214,6 +233,11 @@ while running:
     for cactus in cacti:
         if check_collision(dino, cactus):
             GAME_SPEED = 0
+            end_game = True
+
+    if not end_game:
+        score.update()
+    score.draw()
 
     pygame.display.flip()
     clock.tick(FPS)
