@@ -151,7 +151,7 @@ class Obstical:
 class Score:
 
     def __init__(self):
-        self.width, self.height = 200, 50
+        self.width, self.height = 150, 50
         self.boarder_x, self.boarder_y = 10, 10
         self.score = 0
         self.pos_x = SCREEN_WIDTH - self.width - self.boarder_x
@@ -164,6 +164,46 @@ class Score:
         font = pygame.font.Font(None, 36)
         score_text = font.render(f"Score: {self.score}", True, (255, 0, 0))  # White color text
         SCREEN.blit(score_text, (self.pos_x, self.pos_y))
+
+class Level:
+
+    def __init__(self, score):
+        self.score = score
+    
+    def update(self):
+        if self.score.score < 1000:
+            print(1)
+            self.level_1()
+        elif 1000 <= self.score.score < 3000:
+            print(2)
+            self.level_2()
+        elif 3000 <= self.score.score:
+            print(3)
+            self.level_3()
+
+    def level_1(self):
+        global GAME_SPEED, JX, RX
+        GAME_SPEED = 12
+        JX = GAME_SPEED
+        RX = GAME_SPEED * 60
+
+    def level_2(self):
+        global GAME_SPEED, JX, RX
+        GAME_SPEED = 16
+        JX = GAME_SPEED * 5
+        RX = GAME_SPEED * 20
+
+    def level_3(self):
+        global GAME_SPEED, JX, RX
+        GAME_SPEED = 20
+        JX = GAME_SPEED * 5
+        RX = GAME_SPEED * 20
+
+    def level_3(self):
+        global GAME_SPEED, JX, RX
+        GAME_SPEED = 25
+        JX = GAME_SPEED * 5
+        RX = GAME_SPEED * 20
 
 # Check if the masks overlap
 def check_collision(dinosaur, cactus):
@@ -186,6 +226,7 @@ def check_collision(dinosaur, cactus):
 
 # Game Initialization
 score = Score()
+level = Level(score)
 dino = Dinosaur(100, 100)
 ground = Ground()
 obsticals_generator = Obstical()
@@ -237,6 +278,7 @@ while running:
 
     if not end_game:
         score.update()
+        level.update()
     score.draw()
 
     pygame.display.flip()
