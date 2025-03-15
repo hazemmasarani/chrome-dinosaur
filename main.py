@@ -208,13 +208,6 @@ class Level:
         MIN_OBS_H = 80
         MAX_OBS_H = 150
 
-class Screen:
-    def __init__(self):
-        pass
-
-    def update(self,x):
-        print(x)
-
 # Check if the masks overlap
 def check_collision(dinosaur, cactus):
     frame_rect = dinosaur.cur_frame.get_rect()
@@ -240,7 +233,6 @@ level = Level(score)
 dino = Dinosaur(100, 100)
 ground = Ground()
 obsticals_generator = Obstical()
-screen = Screen()
 cacti = []
 
 running = True
