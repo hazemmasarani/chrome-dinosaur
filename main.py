@@ -14,6 +14,9 @@ GAME_SPEED = 25
 BACKGROUND_COLOR = (135, 206, 235)
 JX = GAME_SPEED * 5
 RX = GAME_SPEED * 20
+MIN_OBS_H = 60
+MAX_OBS_H = 120
+MAX_NUM_OBS_PER_CHUNCK = 6
 
 pygame.display.set_caption('Chrome Dinosaur🦖')
 clock = pygame.time.Clock()
@@ -145,8 +148,8 @@ class Obstical:
             self.generate_cacti(SCREEN_WIDTH, SCREEN_WIDTH + JX)
 
     def generate_cacti(self,lim_x1, lim_x2):
-        for i in range(randint(0, 5)):
-            cacti.append(Cactus(randint(lim_x1, lim_x2), randint(60, 120)))
+        for i in range(randint(0, MAX_NUM_OBS_PER_CHUNCK)):
+            cacti.append(Cactus(randint(lim_x1, lim_x2), randint(MIN_OBS_H, MAX_OBS_H)))
 
 class Score:
 
@@ -172,38 +175,45 @@ class Level:
     
     def update(self):
         if self.score.score < 1000:
-            print(1)
             self.level_1()
         elif 1000 <= self.score.score < 3000:
-            print(2)
             self.level_2()
         elif 3000 <= self.score.score:
-            print(3)
             self.level_3()
 
     def level_1(self):
-        global GAME_SPEED, JX, RX
+        global GAME_SPEED, JX, RX, MAX_NUM_OBS_PER_CHUNCK, MIN_OBS_H, MAX_OBS_H
         GAME_SPEED = 12
         JX = GAME_SPEED
         RX = GAME_SPEED * 60
+        MAX_NUM_OBS_PER_CHUNCK = 2
+        MIN_OBS_H = 30
+        MAX_OBS_H = 60
 
     def level_2(self):
-        global GAME_SPEED, JX, RX
+        global GAME_SPEED, JX, RX, MAX_NUM_OBS_PER_CHUNCK, MIN_OBS_H, MAX_OBS_H
         GAME_SPEED = 16
         JX = GAME_SPEED * 5
         RX = GAME_SPEED * 20
+        MAX_NUM_OBS_PER_CHUNCK = 4
+        MIN_OBS_H = 50
+        MAX_OBS_H = 90
 
     def level_3(self):
-        global GAME_SPEED, JX, RX
+        global GAME_SPEED, JX, RX, MAX_NUM_OBS_PER_CHUNCK, MIN_OBS_H, MAX_OBS_H
         GAME_SPEED = 20
         JX = GAME_SPEED * 5
         RX = GAME_SPEED * 20
+        MAX_NUM_OBS_PER_CHUNCK = 8
+        MIN_OBS_H = 80
+        MAX_OBS_H = 150
 
-    def level_3(self):
-        global GAME_SPEED, JX, RX
-        GAME_SPEED = 25
-        JX = GAME_SPEED * 5
-        RX = GAME_SPEED * 20
+class Screen:
+    def __init__(self):
+        pass
+
+    def update(self,x):
+        print(x)
 
 # Check if the masks overlap
 def check_collision(dinosaur, cactus):
@@ -230,6 +240,7 @@ level = Level(score)
 dino = Dinosaur(100, 100)
 ground = Ground()
 obsticals_generator = Obstical()
+screen = Screen()
 cacti = []
 
 running = True
@@ -238,13 +249,25 @@ end_game = False
 
 while running:
     for event in pygame.event.get():
+        if event.type == pygame.VIDEORESIZE:
+            # Check if the window is resized to the full screen size
+            if event.w == pygame.display.Info().current_w and event.h == pygame.display.Info().current_h:
+                if not fullscreen:
+                    # Switch to fullscreen if not already
+                    screen = pygame.display.set_mode((event.w, event.h), pygame.FULLSCREEN)
+                    fullscreen = True
+            else:
+                if fullscreen:
+                    # Switch back to windowed mode if it's resized and not fullscreen
+                    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+                    fullscreen = False
+
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
             key_pressed = pygame.key.name(event.key)
         if event.type == pygame.KEYUP:
             key_pressed = None
-
     # Update game state
     SCREEN.fill(BACKGROUND_COLOR)
     dino.update(key_pressed)
